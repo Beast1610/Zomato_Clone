@@ -1,24 +1,25 @@
 import express from "express";
+
+import { FoodModel } from "../../database/allModels";
+
 const Router = express.Router();
 
-
 /**
- * Route     /addFood
+ * Route     /:_id
  * Des       Create New Food Item
  * Params    none
  * Access    Public
  * Method    POST
  */
 Router.post("/addFood", async (req, res) => {
-    try {
-      console.log(req.body);
-      const newfood = await FoodModel.create(req.body);
-      if (newfood) return res.status(200).json({ status: succes, data: newfood });
-    } catch (error) {
-      return res.status(500).json({ error: error.message });
-    }
-  });
-
+  try {
+    console.log(req.body);
+    const newfood = await FoodModel.create(req.body);
+    if (newfood) return res.status(200).json({ status: succes, data: newfood });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+})
 
 /**
  * Route     /:_id
@@ -30,11 +31,8 @@ Router.post("/addFood", async (req, res) => {
 Router.get("/:_id", async (req, res) => {
   try {
     const { _id } = req.params;
-
-    await validateId(req.params);
-
-    const food = await FoodModel.findById(_id);
-    return res.json({ food });
+    const foods =await FoodModel.findById(_id);
+    return res.json({ foods });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -50,15 +48,9 @@ Router.get("/:_id", async (req, res) => {
 Router.get("/r/:_id", async (req, res) => {
   try {
     const { _id } = req.params;
-
-    await validateId(req.params);
-
     const foods = await FoodModel.find({
       restaurant: _id,
     });
-
-    // task: food not found return stmt
-
     return res.json({ foods });
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -75,7 +67,6 @@ Router.get("/r/:_id", async (req, res) => {
 Router.get("/c/:category", async (req, res) => {
   try {
     const { category } = req.params;
-    await validateCategory(req.params);
     const foods = await FoodModel.find({
       category: { $regex: category, $options: "i" },
     });
